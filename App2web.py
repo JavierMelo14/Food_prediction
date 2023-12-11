@@ -17,28 +17,21 @@ def index():
 def predict():
 
     city = request.form.get('city')
-    print("City from form:", city)
-    
+        
     category = request.form.get('category')
-    print(category)
-    
+        
     unit = request.form.get('unit') 
-    print(unit)
-
+    
     input_data = df[['City', 'category', 'unit']]
 
     input_data.loc[0] = [city, category, unit]
-    print(input_data.head(5))
+    
+    input_data_encoded = pd.get_dummies(input_data, columns=['City', 'category', 'unit'], drop_first=True)
 
-    all_data_encoded = pd.get_dummies(df, columns=['City', 'category', 'unit'], drop_first=True)
-
-    input_data_encoded = all_data_encoded[all_data_encoded['City_' + str(city)] == 1]
-
-    print("input_data_encoded:", input_data_encoded)
+    input_data_encoded = input_data_encoded[input_data_encoded['City_' + str(city)] == 1]
 
     prediction = model_Food.predict(input_data_encoded)
-    print("prediction:", prediction)
-
+    
     prediction = prediction[0] if isinstance(prediction, (list, np.ndarray)) else prediction
 
     return render_template('result.html', city=city, prediction=prediction)
